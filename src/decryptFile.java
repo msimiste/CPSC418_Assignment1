@@ -13,11 +13,14 @@ public class decryptFile {
 
 	private static String seed;
 	private static String inFile = null;
+	private static String outFile = null;
 
 	public static void main(String args[]) throws Exception {
 
 		inFile = args[0];
+		outFile = inFile.substring(0, inFile.indexOf(".")) + "_OUT" + inFile.substring(inFile.indexOf("."));
 		FileInputStream in_file = null;
+		FileOutputStream out_file = null;
 
 		seed = args[1];
 
@@ -30,9 +33,10 @@ public class decryptFile {
 		// decrypt file
 		try {
 			in_file = new FileInputStream(inFile);
+			out_file = new FileOutputStream(outFile);
 			byte[] ciphtext = new byte[in_file.available()];
 			in_file.read(ciphtext);
-			byte[] decryptedFile;
+			byte[] decryptedFile =null;
 			byte[] fileNoHash = null;
 			byte[] decryptedHash = null;
 			byte[] tamperedFile = null;
@@ -79,6 +83,10 @@ public class decryptFile {
 			verify = compareHash(tamperedHash, decryptedHash);
 			
 			System.out.println("tampered file is OK: "+verify);
+			
+			//write to file
+			out_file.write(decryptedFile);
+			out_file.close();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

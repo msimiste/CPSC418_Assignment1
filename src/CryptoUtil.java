@@ -11,11 +11,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.*;
+
+import javax.crypto.spec.*;
 
 
 public class CryptoUtil {
@@ -27,6 +25,7 @@ public class CryptoUtil {
 	private static KeyGenerator key_gen = null;
 	private static SecretKey sec_key = null;
 	private static byte[] raw = null;
+	private IvParameterSpec ivSpec;
 	
 	private static SecureRandom secRan = null;
 
@@ -57,6 +56,8 @@ public class CryptoUtil {
 
 		// generate the random number from seed
 		secRan = new SecureRandom(seedBytes);
+		secRan = SecureRandom.getInstance("SHA1PRNG");
+		secRan.setSeed(seedBytes);
 
 		// initialize the KeyGenerator
 		key_gen.init(128, secRan);
@@ -70,6 +71,8 @@ public class CryptoUtil {
 
 		// create the cipher object that uses AES as the algorithm
 		sec_cipher = Cipher.getInstance("AES");
+		
+		
 	}
 
 	/**
@@ -102,18 +105,13 @@ public class CryptoUtil {
 		byte[] result = null;
 
 		try {
-			// generate the HMAC key
-			//KeyGenerator theKey = KeyGenerator.getInstance("HMACSHA1");
-			
-			//KeyGenerator theKey = key_gen.getInstance("HMACSHA1");
-			//theKey.init(128, secRan);
-			//SecretKey secretKey = theKey.generateKey();
+			// generate the HMAC key			
 			Mac theMac = Mac.getInstance("HMACSHA1");
 			theMac.init(sec_key);
 
 			// create the hash
 			result = theMac.doFinal(in_data);
-			System.out.println("hmac_sha1 result: " + this.toHexString(result));
+			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -133,7 +131,7 @@ public class CryptoUtil {
 			sec_cipher.init(Cipher.ENCRYPT_MODE, sec_key_spec);
 
 			// create ciphertext
-			out_bytes = sec_cipher.doFinal(data_in);
+			out_bytes = sec_cipher.doFinal(data_in);			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -153,7 +151,7 @@ public class CryptoUtil {
 			// set cipher to decrypt mode
 			sec_cipher.init(Cipher.DECRYPT_MODE, sec_key_spec);
 
-			// do decryption
+			// do decryption		
 			decrypted = sec_cipher.doFinal(data_in);
 
 			// convert to string

@@ -75,7 +75,6 @@ public class secureFile {
 			// do AES encryption
 			aes_ciphertext = cryptoUtil.aes_encrypt(inFileHash);
 			
-					
 			//write to file
 			out_file.write(aes_ciphertext);
 			out_file.close();
